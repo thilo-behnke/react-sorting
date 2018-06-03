@@ -14,5 +14,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "bs-platform": "^3.1.5",
+    "reason-js": "^0.3.0",
+    "reason-react": "^0.4.2"
   }
 }

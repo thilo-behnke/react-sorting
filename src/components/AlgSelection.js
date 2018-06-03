@@ -6,6 +6,7 @@ class AlgSelection extends Component {
         return <div>
             <Button onClick={() => this.props.alertButton('merge')}>MergeSort</Button>
             <Button onClick={() => this.props.alertButton('quick')}>QuickSort</Button>
+            <Button onClick={() => this.props.alertButton('bubble')}>BubbleSort</Button>
         </div>;
     }
 }

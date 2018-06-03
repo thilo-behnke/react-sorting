@@ -1,0 +1,31 @@
+bs_package_flags = -bs-package-name shadowrun-creator-react
+src_root_dir = C:\Users\Thilo\Documents\GitHub\sorting
+bsc = C:\Users\Thilo\Documents\GitHub\sorting\node_modules\bs-platform\lib\bsc.exe
+bsdep = C:\Users\Thilo\Documents\GitHub\sorting\node_modules\bs-platform\lib\bsb_helper.exe
+warnings = -w -30-40+6+7+27+32..39+44+45+101
+bsc_flags = -nostdlib -I "C:\Users\Thilo\Documents\GitHub\sorting\node_modules\bs-platform\lib\ocaml" -no-alias-deps -color always
+ppx_flags = 
+bs_package_includes = -I C:\Users\Thilo\Documents\GitHub\sorting\node_modules\reason-react\lib\ocaml -I C:\Users\Thilo\Documents\GitHub\sorting\node_modules\reason-js\lib\ocaml
+bs_package_dev_includes = 
+namespace = 
+bsb_dir_group = 0
+refmt = C:\Users\Thilo\Documents\GitHub\sorting\node_modules\bs-platform\lib\refmt.exe
+reason_react_jsx = -ppx "C:\Users\Thilo\Documents\GitHub\sorting\node_modules\bs-platform\lib\reactjs_jsx_ppx_2.exe"
+refmt_flags = --print binary
+bsc_lib_includes = -I src
+rule build_ast_and_module_sets_from_re
+  command = ${bsc} -pp "${refmt} ${refmt_flags}" ${reason_react_jsx}  ${ppx_flags} ${warnings} ${bsc_flags} -c -o ${out} -bs-syntax-only -bs-binary-ast -impl ${in}
+  description = [34mBuilding[39m [2m${out}[22m
+build src\test.mlast : build_ast_and_module_sets_from_re $src_root_dir\src\test.re
+rule build_deps
+  command = ${bsdep} ${namespace} -g ${bsb_dir_group} -MD ${in}
+  description = [34mBuilding[39m [2m${out}[22m
+build src\test.mlast.d : build_deps src\test.mlast
+rule build_cmj_cmi
+  command = ${bsc} ${bs_package_flags} -bs-assume-no-mli -bs-no-builtin-ppx-ml -bs-no-implicit-include ${bs_package_includes} ${bsc_lib_includes} ${bsc_extra_includes} ${warnings} ${bsc_flags} -o ${out} -c  ${in} $postbuild
+  depfile = ${in}.d
+  description = [34mBuilding[39m [2m${out}[22m
+build src\test.cmj |  $src_root_dir\src\test.js src\test.cmi : build_cmj_cmi src\test.mlast
+  bsc_flags = $bsc_flags -bs-re-out -bs-super-errors
+  bs_package_flags = $bs_package_flags  -bs-package-output commonjs:src
+build build.ninja : phony  ||  src\test.mlast.d
