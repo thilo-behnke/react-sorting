@@ -1,11 +1,11 @@
 import './App.css';
 
 import { Input } from '@material-ui/core';
-import { curry, range } from 'ramda';
 import Button from '@material-ui/core/es/Button/Button';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import { generateRandomList } from './utils/random';
 import { measureExecutionTimeWrapper } from './utils/time';
 import AlgSelection from './components/AlgSelection';
 import ListInput from './components/ListInput';
@@ -60,19 +60,14 @@ class App extends Component {
       };
    }
 
-   generateRandomNumber = (min, max, isFloat = false) =>
-      curry((min, max, isFloat) => {
-         const range = max - min;
-         const random = Math.random() * range + min;
-         return isFloat ? random : Math.floor(random);
-      })(min, max, isFloat);
-
    generateRandomList = n => {
-      this.setState({ isGenerating: true });
-      new Promise(resolve => {
-         const r = range(0, n).map(x => this.generateRandomNumber(1, 400000));
-         return resolve(r);
-      }).then(list => this.setState({ list, isGenerating: false }));
+      new Promise(resolve =>
+         this.setState({ list: [], isGenerating: true }, () => resolve())
+      ).then(() =>
+         generateRandomList(n).then(list =>
+            this.setState({ list, isGenerating: false })
+         )
+      );
    };
 
    mapSortModeFun = mode => {
