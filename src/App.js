@@ -1,12 +1,12 @@
 import './App.css';
 
 import { Input } from '@material-ui/core';
-import { curry, range } from 'ramda';
 import Button from '@material-ui/core/es/Button/Button';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
-import { measureExecutionTimeWrapper } from './utils/time';
+import { generateRandomList } from './utils/random';
+import { runTaskInWorker } from './utils/worker';
 import AlgSelection from './components/AlgSelection';
 import ListInput from './components/ListInput';
 import ResultOutput from './components/ResultOutput';
@@ -60,19 +60,11 @@ class App extends Component {
       };
    }
 
-   generateRandomNumber = (min, max, isFloat = false) =>
-      curry((min, max, isFloat) => {
-         const range = max - min;
-         const random = Math.random() * range + min;
-         return isFloat ? random : Math.floor(random);
-      })(min, max, isFloat);
-
    generateRandomList = n => {
       this.setState({ isGenerating: true });
-      new Promise(resolve => {
-         const r = range(0, n).map(x => this.generateRandomNumber(1, 400000));
-         return resolve(r);
-      }).then(list => this.setState({ list, isGenerating: false }));
+      runTaskInWorker(generateRandomList, n).then(list =>
+         this.setState({ list, isGenerating: false })
+      );
    };
 
    mapSortModeFun = mode => {
@@ -91,8 +83,8 @@ class App extends Component {
    sortSelected = (mode, list) => {
       const fun = this.mapSortModeFun(mode);
       this.setState({ isSorting: true });
-      measureExecutionTimeWrapper(fun, list).then(([res, t]) =>
-         this.setState({ result: { res, t }, isSorting: false })
+      runTaskInWorker(fun, list).then(res =>
+         this.setState({ result: { res, t: 1000 }, isSorting: false })
       );
    };
 

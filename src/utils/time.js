@@ -1,6 +1,9 @@
-export const measureExecutionTimeWrapper = (f, ...args) => {
+import { curry as _curry } from 'lodash';
+
+export const measureExecutionTimeWrapper = _curry((fun, args) => {
    const tBefore = Date.now();
-   const r = f(...args);
+   console.log(fun, args);
+   const r = fun(args);
    const tAfter = Date.now();
-   return Promise.resolve([r, tAfter - tBefore]);
-};
+   return [r, tAfter - tBefore];
+});
